@@ -39,23 +39,22 @@ export function ChatSidebar() {
   };
 
   const SidebarContent = () => (
-    <>
-      <div className="flex h-full flex-col">
-        <div className="flex items-center justify-between p-4">
-          <h2 className="text-lg font-semibold">Chats</h2>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={handleCreateChat}
-            className="h-8 w-8"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="sr-only">New chat</span>
-          </Button>
-        </div>
-        <Separator />
-        <ScrollArea className="flex-1">
-          <div className="space-y-2 p-2">
+    <div className="flex h-screen flex-col">
+      <div className="flex items-center justify-between p-4 flex-shrink-0">
+        <h2 className="text-lg font-semibold">Chats</h2>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={handleCreateChat}
+          className="h-8 w-8"
+        >
+          <Plus className="h-4 w-4" />
+          <span className="sr-only">New chat</span>
+        </Button>
+      </div>
+      <Separator className="flex-shrink-0" />
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="space-y-2 p-2">
             {chats?.map((chat) => (
               <Button
                 key={chat._id}
@@ -77,8 +76,8 @@ export function ChatSidebar() {
             )}
           </div>
         </ScrollArea>
-        <Separator />
-        <div className="p-4">
+        <Separator className="flex-shrink-0" />
+        <div className="p-4 flex-shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -109,14 +108,13 @@ export function ChatSidebar() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
-    </>
+    </div>
   );
 
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-64 border-r bg-background">
+      <aside className="hidden md:flex w-64 border-r border-border/40 bg-card/50 backdrop-blur-sm h-screen">
         <SidebarContent />
       </aside>
 

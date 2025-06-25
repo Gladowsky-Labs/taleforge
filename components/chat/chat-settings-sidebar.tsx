@@ -50,13 +50,13 @@ export function ChatSettingsSidebar() {
   };
 
   const SidebarContent = () => (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between p-4">
+    <div className="flex h-screen flex-col">
+      <div className="flex items-center justify-between p-4 flex-shrink-0">
         <h2 className="text-lg font-semibold">Chat Settings</h2>
       </div>
-      <Separator />
+      <Separator className="flex-shrink-0" />
       {chat ? (
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 min-h-0">
           <div className="p-4 space-y-6">
             <div className="space-y-2">
               <Label htmlFor="chat-title">Chat Title</Label>
@@ -130,7 +130,7 @@ export function ChatSettingsSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-64 border-l bg-background">
+      <aside className="hidden lg:flex w-64 border-l border-border/40 bg-card/50 backdrop-blur-sm h-screen">
         <SidebarContent />
       </aside>
 

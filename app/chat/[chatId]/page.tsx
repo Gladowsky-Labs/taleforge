@@ -63,46 +63,46 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-background">
       {/* Chat header */}
-      <div className="border-b p-4">
-        <h1 className="text-lg font-semibold">{chat.title}</h1>
+      <div className="border-b border-border/40 p-4 bg-card/50 backdrop-blur-sm flex-shrink-0">
+        <h1 className="text-lg font-semibold text-foreground">{chat.title}</h1>
       </div>
 
-      {/* Messages area */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
-        <div className="space-y-4">
+      {/* Messages area - simplified without nested ScrollArea */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4 pb-20 space-y-4 min-h-full">
           {messages?.map((message) => (
             <div
               key={message._id}
               className={cn(
-                "flex gap-3",
+                "flex gap-3 animate-in fade-in-0 slide-in-from-bottom-2",
                 message.role === "user" ? "justify-end" : "justify-start"
               )}
             >
               {message.role !== "user" && (
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>
+                <Avatar className="h-8 w-8 border border-border/20">
+                  <AvatarFallback className="bg-primary/10 text-primary">
                     <Bot className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
               )}
               <div
                 className={cn(
-                  "max-w-[70%] rounded-lg px-4 py-2",
+                  "max-w-[70%] rounded-2xl px-4 py-3 shadow-sm",
                   message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
+                    ? "bg-primary text-primary-foreground ml-auto"
+                    : "bg-card border border-border/20 text-card-foreground"
                 )}
               >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                <p className="text-xs opacity-50 mt-1">
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                <p className="text-xs mt-2 opacity-60">
                   {new Date(message.createdAt).toLocaleTimeString()}
                 </p>
               </div>
               {message.role === "user" && (
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>
+                <Avatar className="h-8 w-8 border border-border/20">
+                  <AvatarFallback className="bg-secondary text-secondary-foreground">
                     <User className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
@@ -110,41 +110,58 @@ export default function ChatPage() {
             </div>
           ))}
           {messages?.length === 0 && (
-            <div className="text-center text-muted-foreground">
-              <p>No messages yet. Start a conversation!</p>
+            <div className="flex items-center justify-center h-full text-center text-muted-foreground">
+              <div className="space-y-2">
+                <Bot className="h-12 w-12 mx-auto opacity-20" />
+                <p className="text-lg font-medium">Start a conversation</p>
+                <p className="text-sm">Send a message to begin chatting</p>
+              </div>
             </div>
           )}
-          {isSending && messages && messages.length > 0 && (
-            <div className="flex gap-3 justify-start">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>
-                  <Bot className="h-4 w-4" />
+          {isSending && (
+            <div className="flex gap-3 justify-start animate-in fade-in-0 slide-in-from-bottom-2">
+              <Avatar className="h-8 w-8 border border-border/20">
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  <Bot className="h-4 w-4 animate-pulse" />
                 </AvatarFallback>
               </Avatar>
-              <div className="max-w-[70%] rounded-lg px-4 py-2 bg-muted">
-                <p className="text-sm italic text-muted-foreground">Thinking...</p>
+              <div className="max-w-[70%] rounded-2xl px-4 py-3 bg-card border border-border/20">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">AI is thinking...</p>
+                </div>
               </div>
             </div>
           )}
         </div>
-      </ScrollArea>
-
-      {/* Input area */}
-      <div className="border-t p-4">
+      </div>
+        
+      {/* Input area - fixed at bottom */}
+      <div className="border-t border-border/40 bg-card/80 backdrop-blur-sm p-4 flex-shrink-0">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleSend();
           }}
-          className="flex gap-2"
+          className="flex gap-3"
         >
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1"
+            placeholder="Type your message..."
+            className="flex-1 bg-background/50 border-border/40 focus:border-primary/50 rounded-xl"
+            disabled={isSending}
           />
-          <Button type="submit" size="icon" disabled={!input.trim() || isSending}>
+          <Button 
+            type="submit" 
+            size="icon" 
+            disabled={!input.trim() || isSending}
+            className="rounded-xl bg-primary hover:bg-primary/90"
+          >
             <Send className="h-4 w-4" />
             <span className="sr-only">Send message</span>
           </Button>
