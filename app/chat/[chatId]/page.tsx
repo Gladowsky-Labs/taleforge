@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,8 @@ export default function ChatPage() {
   
   const chat = useQuery(api.chats.get, { chatId });
   const messages = useQuery(api.messages.list, { chatId });
-  const sendMessage = useMutation(api.messages.send);
+  const sendMessage = useAction(api.chat.sendMessage);
+  const [isSending, setIsSending] = useState(false);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -33,26 +34,24 @@ export default function ChatPage() {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isSending) return;
 
     const userMessage = input.trim();
     setInput("");
+    setIsSending(true);
 
-    // Send user message
-    await sendMessage({
-      chatId,
-      content: userMessage,
-      role: "user",
-    });
-
-    // Simulate assistant response (you'll replace this with actual LLM logic later)
-    setTimeout(async () => {
+    try {
       await sendMessage({
         chatId,
-        content: "This is a placeholder response. The actual LLM integration will be implemented later.",
-        role: "assistant",
+        content: userMessage,
       });
-    }, 1000);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      // Restore the input if sending failed
+      setInput(userMessage);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   if (!chat) {
@@ -115,6 +114,18 @@ export default function ChatPage() {
               <p>No messages yet. Start a conversation!</p>
             </div>
           )}
+          {isSending && messages && messages.length > 0 && (
+            <div className="flex gap-3 justify-start">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback>
+                  <Bot className="h-4 w-4" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="max-w-[70%] rounded-lg px-4 py-2 bg-muted">
+                <p className="text-sm italic text-muted-foreground">Thinking...</p>
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
 
@@ -133,7 +144,7 @@ export default function ChatPage() {
             placeholder="Type a message..."
             className="flex-1"
           />
-          <Button type="submit" size="icon" disabled={!input.trim()}>
+          <Button type="submit" size="icon" disabled={!input.trim() || isSending}>
             <Send className="h-4 w-4" />
             <span className="sr-only">Send message</span>
           </Button>
