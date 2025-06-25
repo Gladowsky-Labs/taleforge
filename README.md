@@ -1,46 +1,103 @@
-# Welcome to your Convex + Next.js + Convex Auth app
+# TaleForge
 
-This is a [Convex](https://convex.dev/) project created with [`npm create convex`](https://www.npmjs.com/package/create-convex).
+TaleForge is a modern AI-powered chat application built with a full-stack TypeScript architecture. Create multiple chat conversations and interact with AI models through a clean, intuitive interface.
 
-After the initial setup (<2 minutes) you'll have a working full-stack app using:
+## Features
 
-- Convex as your backend (database, server logic)
-- [React](https://react.dev/) as your frontend (web page interactivity)
-- [Next.js](https://nextjs.org/) for optimized web hosting and page routing
-- [Tailwind](https://tailwindcss.com/) for building great looking accessible UI
-- [Convex Auth](https://labs.convex.dev/auth) for authentication
+- **AI-Powered Conversations**: Chat with AI models through OpenRouter integration
+- **Multiple Chat Sessions**: Create and manage multiple chat conversations
+- **Real-time Updates**: Live chat updates powered by Convex
+- **User Authentication**: Secure sign-up and sign-in functionality
+- **Responsive Design**: Clean, modern UI built with Tailwind CSS and Radix UI
 
-## Get started
+## Tech Stack
 
-If you just cloned this codebase and didn't use `npm create convex`, run:
+- **Frontend**: [Next.js 15](https://nextjs.org/) with [React 19](https://react.dev/)
+- **Backend**: [Convex](https://convex.dev/) for database and server logic
+- **Authentication**: [Convex Auth](https://labs.convex.dev/auth)
+- **AI Integration**: [OpenRouter API](https://openrouter.ai/) for LLM access
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with [Radix UI](https://www.radix-ui.com/) components
+- **Type Safety**: Full TypeScript support throughout
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- [OpenRouter API key](https://openrouter.ai/) for AI model access
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd taleforge
 ```
+
+2. Install dependencies:
+```bash
 npm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+
+Configure the following environment variables:
+- `OPENROUTER_API_KEY`: Your OpenRouter API key
+- `RP_MODEL`: AI model to use (default: `openai/gpt-4o-mini`)
+- `TITLE_MODEL`: Model for generating chat titles (default: `openai/gpt-4o-mini`)
+- `SITE_URL`: Your site URL (for development: `http://localhost:3000`)
+- `SITE_NAME`: Your site name (default: `TaleForge Chat`)
+
+4. Run the development server:
+```bash
 npm run dev
 ```
 
-If you're reading this README on GitHub and want to use this template, run:
+The app will be available at [http://localhost:3000](http://localhost:3000)
+
+## Project Structure
 
 ```
-npm create convex@latest -- -t nextjs-convexauth
+taleforge/
+├── app/                    # Next.js App Router pages
+│   ├── chat/              # Chat-related pages
+│   ├── signin/            # Authentication pages
+│   └── signup/            
+├── components/            # React components
+│   ├── auth/             # Authentication components
+│   ├── chat/             # Chat-related components
+│   └── ui/               # Reusable UI components
+├── convex/               # Convex backend functions
+│   ├── auth.ts           # Authentication logic
+│   ├── chat.ts           # Chat message handling
+│   ├── chats.ts          # Chat management
+│   ├── messages.ts       # Message CRUD operations
+│   ├── openai.ts         # OpenRouter/OpenAI integration
+│   └── schema.ts         # Database schema
+└── lib/                  # Utility functions
 ```
 
-## Learn more
+## Available Scripts
 
-To learn more about developing your project with Convex, check out:
+- `npm run dev` - Start development server (frontend + backend)
+- `npm run dev:frontend` - Start only the Next.js frontend
+- `npm run dev:backend` - Start only the Convex backend
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
-- The [Tour of Convex](https://docs.convex.dev/get-started) for a thorough introduction to Convex principles.
-- The rest of [Convex docs](https://docs.convex.dev/) to learn about all Convex features.
-- [Stack](https://stack.convex.dev/) for in-depth articles on advanced topics.
-- [Convex Auth docs](https://labs.convex.dev/auth) for documentation on the Convex Auth library.
+## Learn More
 
-## Configuring other authentication methods
+### Documentation
+- [Convex Documentation](https://docs.convex.dev/) - Learn about the backend platform
+- [Convex Auth](https://labs.convex.dev/auth) - Authentication documentation
+- [Next.js Documentation](https://nextjs.org/docs) - Frontend framework docs
+- [OpenRouter API](https://openrouter.ai/docs) - AI model API documentation
 
-To configure different authentication methods, see [Configuration](https://labs.convex.dev/auth/config) in the Convex Auth docs.
-
-## Join the community
-
-Join thousands of developers building full-stack apps with Convex:
-
-- Join the [Convex Discord community](https://convex.dev/community) to get help in real-time.
-- Follow [Convex on GitHub](https://github.com/get-convex/), star and contribute to the open-source implementation of Convex.
+### Community
+- [Convex Discord](https://convex.dev/community) - Get help and connect with developers
+- [Next.js Discord](https://nextjs.org/discord) - Next.js community support
