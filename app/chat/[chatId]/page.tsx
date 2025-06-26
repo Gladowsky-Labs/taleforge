@@ -11,12 +11,14 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Send, Bot, User } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "@/contexts/sidebar-context";
 
 export default function ChatPage() {
   const params = useParams();
   const chatId = params.chatId as Id<"chats">;
   const [input, setInput] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { leftSidebarOpen } = useSidebar();
   
   const chat = useQuery(api.chats.get, { chatId });
   const messages = useQuery(api.messages.list, { chatId });
@@ -66,11 +68,12 @@ export default function ChatPage() {
     <div className="flex flex-col h-full bg-background">
       {/* Chat header */}
       <div className="border-b border-border/40 p-4 bg-card/50 backdrop-blur-sm flex-shrink-0">
-        <div className="flex items-center">
-          <div className="w-10 md:hidden" /> {/* Spacer for mobile toggle button */}
-          <h1 className="text-lg font-semibold text-foreground flex-1 text-center md:text-left">{chat.title}</h1>
-          <div className="w-10 lg:hidden" /> {/* Spacer for mobile settings button */}
-        </div>
+        <h1 className={cn(
+          "text-lg font-semibold text-foreground transition-all duration-200",
+          !leftSidebarOpen && "md:ml-12" // Shift right when sidebar is closed to make room for toggle button
+        )}>
+          {chat.title}
+        </h1>
       </div>
 
       {/* Messages area - simplified without nested ScrollArea */}

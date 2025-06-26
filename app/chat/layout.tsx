@@ -8,11 +8,11 @@ import {
   PanelGroup, 
   PanelResizeHandle 
 } from "react-resizable-panels";
-import { useSidebarState } from "@/hooks/use-sidebar-state";
+import { SidebarProvider, useSidebar } from "@/contexts/sidebar-context";
 import { Button } from "@/components/ui/button";
 import { PanelLeft, PanelRight } from "lucide-react";
 
-export default function ChatLayout({ children }: { children: ReactNode }) {
+function ChatLayoutContent({ children }: { children: ReactNode }) {
   const {
     leftSidebarOpen,
     rightSidebarOpen,
@@ -22,7 +22,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
     toggleRightSidebar,
     setLeftSidebarSize,
     setRightSidebarSize,
-  } = useSidebarState();
+  } = useSidebar();
 
   return (
     <div className="h-screen overflow-hidden relative">
@@ -108,5 +108,13 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
         <ChatSettingsSidebar />
       </div>
     </div>
+  );
+}
+
+export default function ChatLayout({ children }: { children: ReactNode }) {
+  return (
+    <SidebarProvider>
+      <ChatLayoutContent>{children}</ChatLayoutContent>
+    </SidebarProvider>
   );
 }
