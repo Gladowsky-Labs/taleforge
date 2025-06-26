@@ -57,7 +57,7 @@ export function SignUpForm() {
         flow: "signUp",
       });
       router.push("/");
-    } catch (err) {
+    } catch {
       setError("Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);

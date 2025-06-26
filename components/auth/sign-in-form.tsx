@@ -52,7 +52,7 @@ export function SignInForm() {
         flow: "signIn",
       });
       router.push("/");
-    } catch (err) {
+    } catch {
       setError("Invalid email or password");
     } finally {
       setIsLoading(false);
@@ -107,7 +107,7 @@ export function SignInForm() {
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Button
             variant="link"
             className="p-0 h-auto font-normal"
