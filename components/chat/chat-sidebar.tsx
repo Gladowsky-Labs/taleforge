@@ -14,11 +14,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MessageSquare, Settings, LogOut, ChevronDown, PanelLeftClose, X, Sparkles } from "lucide-react";
+import { MessageSquare, Settings, LogOut, ChevronDown, PanelLeftClose, X, Sparkles, UserPlus } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CreateUniverseChatDialog } from "./create-universe-chat-dialog";
+import { CreateCharacterDialog } from "./create-character-dialog";
 
 interface ChatSidebarProps {
   onToggle?: () => void;
@@ -29,17 +30,12 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
   const params = useParams();
   const { signOut } = useAuthActions();
   const chats = useQuery(api.chats.list);
-  const createChat = useMutation(api.chats.create);
   const deleteChat = useMutation(api.chats.remove);
   const [showUniverseDialog, setShowUniverseDialog] = useState(false);
+  const [showCharacterDialog, setShowCharacterDialog] = useState(false);
   
   // Get current user ID for universe chat creation
   const currentUser = useQuery(api.users.currentUser);
-
-  const handleCreateChat = async () => {
-    const chatId = await createChat({ title: "New Chat" });
-    router.push(`/chat/${chatId}`);
-  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -76,21 +72,21 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
         <div className="px-3 pb-3 space-y-2">
           <Button
             size="sm"
-            variant="outline"
-            onClick={handleCreateChat}
-            className="w-full justify-start"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            New Chat
-          </Button>
-          <Button
-            size="sm"
             variant="default"
             onClick={() => setShowUniverseDialog(true)}
             className="w-full justify-start"
           >
             <Sparkles className="h-4 w-4 mr-2" />
             New Adventure
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowCharacterDialog(true)}
+            className="w-full justify-start"
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            New Character
           </Button>
         </div>
       </div>
@@ -189,6 +185,15 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
         <CreateUniverseChatDialog
           open={showUniverseDialog}
           onOpenChange={setShowUniverseDialog}
+          userId={currentUser._id}
+        />
+      )}
+
+      {/* Character Creation Dialog */}
+      {currentUser?._id && (
+        <CreateCharacterDialog
+          open={showCharacterDialog}
+          onOpenChange={setShowCharacterDialog}
           userId={currentUser._id}
         />
       )}

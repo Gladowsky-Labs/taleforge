@@ -110,7 +110,7 @@ export function CharacterSelector({
                 <Crown className="h-5 w-5 text-amber-500" />
                 Original Protagonists
               </h3>
-              <div className="grid gap-3">
+              <div className="space-y-3">
                 {protagonists.map((character) => (
                   <Card 
                     key={character._id}
@@ -121,45 +121,51 @@ export function CharacterSelector({
                     }`}
                     onClick={() => onSelect(character._id, undefined)}
                   >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-base">{character.name}</CardTitle>
-                          <Badge variant="secondary" className="mt-1">
-                            <Crown className="h-3 w-3 mr-1" />
-                            Protagonist
-                          </Badge>
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <CardTitle className="text-lg mb-2">{character.name}</CardTitle>
+                              <Badge variant="secondary">
+                                <Crown className="h-3 w-3 mr-1" />
+                                Protagonist
+                              </Badge>
+                            </div>
+                            {selectedCharacterId === character._id && (
+                              <Badge variant="default" className="shrink-0">
+                                Selected
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <div className="grid lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2">
+                              <CardDescription className="text-sm leading-relaxed mb-3">
+                                {character.description}
+                              </CardDescription>
+                              {character.personality && (
+                                <p className="text-sm text-muted-foreground">
+                                  <strong className="text-foreground">Personality:</strong> {character.personality}
+                                </p>
+                              )}
+                            </div>
+                            
+                            {character.specialAbilities && character.specialAbilities.length > 0 && (
+                              <div>
+                                <p className="text-sm font-medium text-foreground mb-2">Special Abilities</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {character.specialAbilities.map((ability, index) => (
+                                    <Badge key={index} variant="outline" className="text-xs">
+                                      {ability}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        {selectedCharacterId === character._id && (
-                          <Badge variant="default" className="shrink-0">
-                            Selected
-                          </Badge>
-                        )}
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="line-clamp-2 mb-2">
-                        {character.description}
-                      </CardDescription>
-                      {character.personality && (
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          <strong>Personality:</strong> {character.personality}
-                        </p>
-                      )}
-                      {character.specialAbilities && character.specialAbilities.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {character.specialAbilities.slice(0, 3).map((ability, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {ability}
-                            </Badge>
-                          ))}
-                          {character.specialAbilities.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{character.specialAbilities.length - 3} more
-                            </Badge>
-                          )}
-                        </div>
-                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -251,7 +257,7 @@ export function CharacterSelector({
             </div>
             
             {customCharacters && customCharacters.length > 0 ? (
-              <div className="grid gap-3">
+              <div className="space-y-3">
                 {customCharacters.map((character) => (
                   <Card 
                     key={character._id}
@@ -262,45 +268,51 @@ export function CharacterSelector({
                     }`}
                     onClick={() => onSelect(undefined, character._id)}
                   >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-base">{character.name}</CardTitle>
-                          <Badge variant="secondary" className="mt-1">
-                            <Sparkles className="h-3 w-3 mr-1" />
-                            Custom
-                          </Badge>
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <CardTitle className="text-lg mb-2">{character.name}</CardTitle>
+                              <Badge variant="secondary">
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                Custom
+                              </Badge>
+                            </div>
+                            {selectedCustomCharacterId === character._id && (
+                              <Badge variant="default" className="shrink-0">
+                                Selected
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <div className="grid lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2">
+                              <CardDescription className="text-sm leading-relaxed mb-3">
+                                {character.description}
+                              </CardDescription>
+                              {character.personality && (
+                                <p className="text-sm text-muted-foreground">
+                                  <strong className="text-foreground">Personality:</strong> {character.personality}
+                                </p>
+                              )}
+                            </div>
+                            
+                            {character.specialAbilities && character.specialAbilities.length > 0 && (
+                              <div>
+                                <p className="text-sm font-medium text-foreground mb-2">Special Abilities</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {character.specialAbilities.map((ability, index) => (
+                                    <Badge key={index} variant="outline" className="text-xs">
+                                      {ability}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        {selectedCustomCharacterId === character._id && (
-                          <Badge variant="default" className="shrink-0">
-                            Selected
-                          </Badge>
-                        )}
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="line-clamp-2 mb-2">
-                        {character.description}
-                      </CardDescription>
-                      {character.personality && (
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          <strong>Personality:</strong> {character.personality}
-                        </p>
-                      )}
-                      {character.specialAbilities && character.specialAbilities.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {character.specialAbilities.slice(0, 3).map((ability, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {ability}
-                            </Badge>
-                          ))}
-                          {character.specialAbilities.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{character.specialAbilities.length - 3} more
-                            </Badge>
-                          )}
-                        </div>
-                      )}
                     </CardContent>
                   </Card>
                 ))}
