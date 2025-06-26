@@ -28,6 +28,31 @@ export const list = query({
   },
 });
 
+export const count = query({
+  args: {
+    chatId: v.id("chats"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return 0;
+    }
+
+    // Verify the user owns this chat
+    const chat = await ctx.db.get(args.chatId);
+    if (!chat || chat.userId !== userId) {
+      return 0;
+    }
+
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
+      .collect();
+
+    return messages.length;
+  },
+});
+
 export const send = mutation({
   args: {
     chatId: v.id("chats"),
