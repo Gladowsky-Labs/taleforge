@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -13,10 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MessageSquare, Settings, LogOut, ChevronDown, PanelLeftClose, X } from "lucide-react";
+import { Plus, MessageSquare, Settings, LogOut, ChevronDown, PanelLeftClose, X, Sparkles } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { CreateUniverseChatDialog } from "./create-universe-chat-dialog";
 
 interface ChatSidebarProps {
   onToggle?: () => void;
@@ -29,6 +31,10 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
   const chats = useQuery(api.chats.list);
   const createChat = useMutation(api.chats.create);
   const deleteChat = useMutation(api.chats.remove);
+  const [showUniverseDialog, setShowUniverseDialog] = useState(false);
+  
+  // Get current user ID for universe chat creation
+  const currentUser = useQuery(api.users.currentUser);
 
   const handleCreateChat = async () => {
     const chatId = await createChat({ title: "New Chat" });
@@ -52,29 +58,40 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col overflow-hidden w-full">
-      <div className="flex items-center justify-between p-3 flex-shrink-0 border-b min-w-0">
-        <h2 className="text-base font-semibold truncate flex-1 min-w-0">Chats</h2>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={handleCreateChat}
-            className="h-8 w-8"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="sr-only">New chat</span>
-          </Button>
+      <div className="flex-shrink-0 border-b">
+        <div className="flex items-center justify-between p-3 min-w-0">
+          <h2 className="text-base font-semibold truncate flex-1 min-w-0">Chats</h2>
           {onToggle && (
             <Button
               size="icon"
               variant="ghost"
               onClick={onToggle}
-              className="h-8 w-8"
+              className="h-8 w-8 flex-shrink-0"
             >
               <PanelLeftClose className="h-4 w-4" />
               <span className="sr-only">Close sidebar</span>
             </Button>
           )}
+        </div>
+        <div className="px-3 pb-3 space-y-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleCreateChat}
+            className="w-full justify-start"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            New Chat
+          </Button>
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => setShowUniverseDialog(true)}
+            className="w-full justify-start"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            New Adventure
+          </Button>
         </div>
       </div>
       <ScrollArea className="flex-1 overflow-y-auto">
@@ -166,6 +183,15 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
           <SidebarContent />
         </SheetContent>
       </Sheet>
+
+      {/* Universe Chat Dialog */}
+      {currentUser?._id && (
+        <CreateUniverseChatDialog
+          open={showUniverseDialog}
+          onOpenChange={setShowUniverseDialog}
+          userId={currentUser._id}
+        />
+      )}
     </>
   );
 }
