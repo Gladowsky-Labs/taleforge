@@ -278,18 +278,18 @@ export default function ChatPage() {
                 onChange={(e) => setInput(e.target.value)}
                 onFocus={() => setIsInputFocused(true)}
                 onBlur={() => setIsInputFocused(false)}
-                placeholder="What's on your mind?"
+                placeholder=""
                 className={cn(
-                  "w-full glass border-2 border-transparent rounded-[32px] py-6 px-8 text-[16px] font-medium transition-all duration-500 resize-none min-h-[64px] max-h-40 focus-premium",
+                  "w-full glass border-2 border-transparent rounded-[32px] py-6 px-8 text-[16px] font-medium transition-all duration-500 resize-none min-h-[64px] max-h-40 focus-premium relative z-20",
                   isInputFocused && "border-primary/30 shadow-2xl",
                   !isInputFocused && "hover:border-primary/20"
                 )}
                 disabled={isSending}
               />
               
-              {/* Floating Label Effect */}
+              {/* Floating Label Effect - Fixed pointer events */}
               {!input && !isInputFocused && (
-                <div className="absolute inset-0 pointer-events-none flex items-center px-8">
+                <div className="absolute inset-y-0 left-0 pointer-events-none flex items-center px-8 z-10">
                   <div className="flex items-center gap-3 text-muted-foreground/50">
                     <div className="w-2 h-2 rounded-full bg-primary/30 animate-pulse" />
                     <span className="text-[16px] font-medium">Ask me anything...</span>
@@ -317,7 +317,7 @@ export default function ChatPage() {
             
             {/* Input Enhancement Effects */}
             <div className={cn(
-              "absolute -inset-1 bg-gradient-primary rounded-[33px] opacity-0 transition-all duration-500 blur-lg",
+              "absolute -inset-1 bg-gradient-primary rounded-[33px] opacity-0 transition-all duration-500 blur-lg pointer-events-none -z-10",
               isInputFocused && "opacity-20"
             )} />
           </div>
