@@ -25,7 +25,36 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
   } = useSidebarState();
 
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="h-screen overflow-hidden relative">
+      {/* Toggle buttons - always visible when sidebars are closed */}
+      <div className="absolute left-0 right-0 top-0 flex justify-between pointer-events-none p-4 z-20">
+        {!leftSidebarOpen && (
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={toggleLeftSidebar}
+            className="pointer-events-auto hidden md:flex bg-background/80 backdrop-blur-sm border shadow-sm hover:bg-background/90"
+            aria-label="Open chat sidebar"
+            title="Open chat sidebar"
+          >
+            <PanelLeft className="h-4 w-4" />
+          </Button>
+        )}
+        <div className="flex-1" />
+        {!rightSidebarOpen && (
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={toggleRightSidebar}
+            className="pointer-events-auto hidden lg:flex bg-background/80 backdrop-blur-sm border shadow-sm hover:bg-background/90"
+            aria-label="Open settings sidebar"
+            title="Open settings sidebar"
+          >
+            <PanelRight className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+
       <PanelGroup direction="horizontal" className="h-full">
         {/* Left sidebar panel */}
         {leftSidebarOpen && (
@@ -47,31 +76,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
         
         {/* Main content panel - takes up remaining space */}
         <Panel id="main-content" order={2}>
-          <main className="flex flex-col h-full overflow-hidden relative">
-            {/* Toggle buttons positioned in header area */}
-            <div className="absolute left-0 right-0 top-0 flex justify-between pointer-events-none p-4">
-              {!leftSidebarOpen && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={toggleLeftSidebar}
-                  className="pointer-events-auto hidden md:flex"
-                >
-                  <PanelLeft className="h-4 w-4" />
-                </Button>
-              )}
-              <div className="flex-1" />
-              {!rightSidebarOpen && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={toggleRightSidebar}
-                  className="pointer-events-auto hidden lg:flex"
-                >
-                  <PanelRight className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
+          <main className="flex flex-col h-full overflow-hidden">
             {children}
           </main>
         </Panel>
