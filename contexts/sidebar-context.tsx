@@ -6,12 +6,8 @@ import { useSidebarState } from "@/hooks/use-sidebar-state";
 interface SidebarContextType {
   leftSidebarOpen: boolean;
   rightSidebarOpen: boolean;
-  leftSidebarSize: number;
-  rightSidebarSize: number;
   toggleLeftSidebar: () => void;
   toggleRightSidebar: () => void;
-  setLeftSidebarSize: (size: number) => void;
-  setRightSidebarSize: (size: number) => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);

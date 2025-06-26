@@ -5,15 +5,11 @@ import { useState, useEffect, useCallback } from "react";
 interface SidebarState {
   leftSidebarOpen: boolean;
   rightSidebarOpen: boolean;
-  leftSidebarSize: number;
-  rightSidebarSize: number;
 }
 
 const DEFAULT_STATE: SidebarState = {
   leftSidebarOpen: true,
   rightSidebarOpen: true,
-  leftSidebarSize: 20, // percentage
-  rightSidebarSize: 20, // percentage
 };
 
 const STORAGE_KEY = "taleforge-sidebar-state";
@@ -46,19 +42,9 @@ export function useSidebarState() {
     setState((prev) => ({ ...prev, rightSidebarOpen: !prev.rightSidebarOpen }));
   }, []);
 
-  const setLeftSidebarSize = useCallback((size: number) => {
-    setState((prev) => ({ ...prev, leftSidebarSize: size }));
-  }, []);
-
-  const setRightSidebarSize = useCallback((size: number) => {
-    setState((prev) => ({ ...prev, rightSidebarSize: size }));
-  }, []);
-
   return {
     ...state,
     toggleLeftSidebar,
     toggleRightSidebar,
-    setLeftSidebarSize,
-    setRightSidebarSize,
   };
 }

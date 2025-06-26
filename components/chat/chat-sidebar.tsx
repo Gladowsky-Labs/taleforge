@@ -99,14 +99,14 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
               >
                 <Button
                   variant={params.chatId === chat._id ? "secondary" : "ghost"}
-                  className="w-full justify-start h-auto py-2 px-2 group relative"
+                  className="w-55 justify-start h-auto py-2 pl-2 pr-8 group relative overflow-hidden"
                   onClick={() => {
                     router.push(`/chat/${chat._id}`);
                   }}
                 >
-                  <div className="flex items-center w-full min-w-0">
+                  <div className="flex items-center w-full min-w-0 overflow-hidden">
                     <MessageSquare className="mr-2 h-4 w-4 flex-shrink-0" />
-                    <span className="truncate text-sm flex-1 text-left">{chat.title}</span>
+                    <span className="truncate text-sm text-left min-w-0 block max-w-full">{chat.title}</span>
                   </div>
                 </Button>
                 <Button
@@ -171,7 +171,7 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
       {/* Mobile sidebar */}
       <Sheet>
         <SheetTrigger asChild className="md:hidden">
-          <Button variant="ghost" size="icon" className="absolute top-4 left-4">
+          <Button variant="ghost" size="sm" className="absolute top-4 left-4">
             <MessageSquare className="h-5 w-5" />
           </Button>
         </SheetTrigger>

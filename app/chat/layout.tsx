@@ -3,29 +3,21 @@
 import { ReactNode } from "react";
 import { ChatSidebar } from "@/components/chat/chat-sidebar";
 import { ChatSettingsSidebar } from "@/components/chat/chat-settings-sidebar";
-import { 
-  Panel, 
-  PanelGroup, 
-  PanelResizeHandle 
-} from "react-resizable-panels";
 import { SidebarProvider, useSidebar } from "@/contexts/sidebar-context";
 import { Button } from "@/components/ui/button";
 import { PanelLeft, PanelRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function ChatLayoutContent({ children }: { children: ReactNode }) {
   const {
     leftSidebarOpen,
     rightSidebarOpen,
-    leftSidebarSize,
-    rightSidebarSize,
     toggleLeftSidebar,
     toggleRightSidebar,
-    setLeftSidebarSize,
-    setRightSidebarSize,
   } = useSidebar();
 
   return (
-    <div className="h-screen overflow-hidden relative">
+    <div className="h-screen overflow-hidden relative flex">
       {/* Toggle buttons - always visible when sidebars are closed */}
       <div className="absolute left-0 right-0 top-0 flex justify-between pointer-events-none p-4 z-20">
         {!leftSidebarOpen && (
@@ -55,50 +47,38 @@ function ChatLayoutContent({ children }: { children: ReactNode }) {
         )}
       </div>
 
-      <PanelGroup direction="horizontal" className="h-full">
-        {/* Left sidebar panel */}
+      {/* Left sidebar with fixed width */}
+      <div
+        className={cn(
+          "hidden md:block h-full border-r bg-background transition-all duration-300 ease-in-out",
+          leftSidebarOpen ? "w-60" : "w-0"
+        )}
+      >
         {leftSidebarOpen && (
-          <>
-            <Panel
-              id="left-sidebar"
-              order={1}
-              defaultSize={leftSidebarSize}
-              minSize={12}
-              maxSize={30}
-              onResize={setLeftSidebarSize}
-              className="hidden md:block"
-            >
-              <ChatSidebar onToggle={toggleLeftSidebar} />
-            </Panel>
-            <PanelResizeHandle className="hidden md:block w-1 bg-border/20 hover:bg-primary/20 transition-colors duration-150 relative before:absolute before:inset-y-0 before:left-1/2 before:-translate-x-1/2 before:w-4 before:hover:cursor-col-resize" />
-          </>
+          <div className="w-60 h-full">
+            <ChatSidebar onToggle={toggleLeftSidebar} />
+          </div>
         )}
-        
-        {/* Main content panel - takes up remaining space */}
-        <Panel id="main-content" order={2}>
-          <main className="flex flex-col h-full overflow-hidden">
-            {children}
-          </main>
-        </Panel>
-        
-        {/* Right sidebar panel */}
+      </div>
+      
+      {/* Main content - takes up remaining space */}
+      <main className="flex-1 flex flex-col h-full overflow-hidden">
+        {children}
+      </main>
+      
+      {/* Right sidebar with fixed width */}
+      <div
+        className={cn(
+          "hidden lg:block h-full border-l bg-background transition-all duration-300 ease-in-out",
+          rightSidebarOpen ? "w-100" : "w-0"
+        )}
+      >
         {rightSidebarOpen && (
-          <>
-            <PanelResizeHandle className="hidden lg:block w-1 bg-transparent hover:bg-border/50 transition-colors relative before:absolute before:inset-y-0 before:left-1/2 before:-translate-x-1/2 before:w-3 before:hover:cursor-col-resize" />
-            <Panel
-              id="right-sidebar"
-              order={3}
-              defaultSize={rightSidebarSize}
-              minSize={12}
-              maxSize={30}
-              onResize={setRightSidebarSize}
-              className="hidden lg:block"
-            >
-              <ChatSettingsSidebar onToggle={toggleRightSidebar} />
-            </Panel>
-          </>
+          <div className="w-100 h-full">
+            <ChatSettingsSidebar onToggle={toggleRightSidebar} />
+          </div>
         )}
-      </PanelGroup>
+      </div>
       
       {/* Mobile sidebars remain unchanged */}
       <div className="md:hidden">
