@@ -17,7 +17,7 @@ export default function ChatPage() {
   const params = useParams();
   const chatId = params.chatId as Id<"chats">;
   const [input, setInput] = useState("");
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const { leftSidebarOpen } = useSidebar();
   
   const chat = useQuery(api.chats.get, { chatId });
@@ -27,11 +27,8 @@ export default function ChatPage() {
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollElement) {
-        scrollElement.scrollTop = scrollElement.scrollHeight;
-      }
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
@@ -41,6 +38,11 @@ export default function ChatPage() {
     const userMessage = input.trim();
     setInput("");
     setIsSending(true);
+
+    // Scroll to bottom when sending a message
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
 
     try {
       await sendMessage({
@@ -77,7 +79,7 @@ export default function ChatPage() {
       </div>
 
       {/* Messages area - simplified without nested ScrollArea */}
-      <div className="flex-1 overflow-y-auto">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto">
         <div className="p-4 pb-20 space-y-4 min-h-full">
           {messages?.map((message) => (
             <div
