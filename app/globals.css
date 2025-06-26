@@ -229,44 +229,19 @@
     background: var(--gradient-accent);
   }
   
-  /* Ultra Premium Animations */
+  /* Clean, Fast Animations */
   .animate-message-in {
-    animation: messageIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  }
-  
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite alternate;
+    animation: messageIn 0.2s ease-out forwards;
   }
   
   @keyframes messageIn {
     from {
       opacity: 0;
-      transform: translateY(30px) scale(0.9) rotateX(10deg);
-      filter: blur(4px);
+      transform: translateY(10px);
     }
     to {
       opacity: 1;
-      transform: translateY(0) scale(1) rotateX(0deg);
-      filter: blur(0px);
-    }
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    33% { transform: translateY(-10px) rotate(1deg); }
-    66% { transform: translateY(-5px) rotate(-1deg); }
-  }
-  
-  @keyframes glow {
-    from {
-      box-shadow: 0 0 20px oklch(0.52 0.2 280 / 0.3);
-    }
-    to {
-      box-shadow: 0 0 30px oklch(0.52 0.2 280 / 0.6), 0 0 40px oklch(0.52 0.2 280 / 0.3);
+      transform: translateY(0);
     }
   }
   
@@ -278,34 +253,18 @@
     background-clip: text;
   }
   
-  /* Enhanced Interactions */
+  /* Clean Interactions */
   .hover-lift {
-    @apply transition-all duration-300 ease-out;
+    @apply transition-transform duration-150 ease-out;
   }
   
   .hover-lift:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 
-      0 20px 40px oklch(0 0 0 / 0.15),
-      0 0 0 1px oklch(0.52 0.2 280 / 0.1);
+    transform: translateY(-1px);
   }
   
-  .hover-glow:hover {
-    box-shadow: 
-      0 0 20px oklch(0.52 0.2 280 / 0.4),
-      0 8px 32px oklch(0 0 0 / 0.15);
-  }
-  
-  /* Premium Focus States */
+  /* Clean Focus States */
   .focus-premium {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .focus-premium:focus {
-    box-shadow: 
-      0 0 0 2px var(--background),
-      0 0 0 4px oklch(0.52 0.2 280 / 0.3),
-      0 8px 24px oklch(0 0 0 / 0.1);
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-1 focus:ring-offset-background;
+    transition: box-shadow 0.15s ease-out;
   }
 }

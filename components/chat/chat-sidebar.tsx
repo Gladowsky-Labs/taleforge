@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -31,7 +29,6 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
   const chats = useQuery(api.chats.list);
   const createChat = useMutation(api.chats.create);
   const deleteChat = useMutation(api.chats.remove);
-  const [hoveredChatId, setHoveredChatId] = useState<string | null>(null);
 
   const handleCreateChat = async () => {
     const chatId = await createChat({ title: "New Chat" });
@@ -54,10 +51,10 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
   };
 
   const SidebarContent = () => (
-    <div className="flex h-screen flex-col">
-      <div className="flex items-center justify-between p-4 flex-shrink-0">
-        <h2 className="text-lg font-semibold">Chats</h2>
-        <div className="flex items-center gap-2">
+    <div className="flex h-full flex-col overflow-hidden w-full">
+      <div className="flex items-center justify-between p-3 flex-shrink-0 border-b min-w-0">
+        <h2 className="text-base font-semibold truncate flex-1 min-w-0">Chats</h2>
+        <div className="flex items-center gap-1 flex-shrink-0">
           <Button
             size="icon"
             variant="ghost"
@@ -80,66 +77,62 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
           )}
         </div>
       </div>
-      <Separator className="flex-shrink-0" />
-      <ScrollArea className="flex-1 min-h-0">
-        <div className="space-y-2 p-2">
+      <ScrollArea className="flex-1 overflow-y-auto">
+        <div className="space-y-1 p-2 w-full">
             {chats?.map((chat) => (
               <div
                 key={chat._id}
-                className="relative group"
-                onMouseEnter={() => setHoveredChatId(chat._id)}
-                onMouseLeave={() => setHoveredChatId(null)}
+                className="relative group w-full"
               >
                 <Button
                   variant={params.chatId === chat._id ? "secondary" : "ghost"}
-                  className="w-full justify-start pr-8"
+                  className="w-full justify-start h-auto py-2 px-2 group relative"
                   onClick={() => {
                     router.push(`/chat/${chat._id}`);
                   }}
                 >
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  <span className="truncate">{chat.title}</span>
+                  <div className="flex items-center w-full min-w-0">
+                    <MessageSquare className="mr-2 h-4 w-4 flex-shrink-0" />
+                    <span className="truncate text-sm flex-1 text-left">{chat.title}</span>
+                  </div>
                 </Button>
-                {hoveredChatId === chat._id && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => handleDeleteChat(chat._id, e)}
-                  >
-                    <X className="h-3 w-3" />
-                    <span className="sr-only">Delete chat</span>
-                  </Button>
-                )}
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  onClick={(e) => handleDeleteChat(chat._id, e)}
+                >
+                  <X className="h-3 w-3" />
+                  <span className="sr-only">Delete chat</span>
+                </Button>
               </div>
             ))}
             {chats?.length === 0 && (
-              <div className="text-center text-sm text-muted-foreground py-8">
+              <div className="text-center text-xs text-muted-foreground py-8 px-2">
                 No chats yet. Create one to get started!
               </div>
             )}
           </div>
         </ScrollArea>
-        <Separator className="flex-shrink-0" />
-        <div className="p-4 flex-shrink-0">
+        <div className="p-3 flex-shrink-0 border-t w-full">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 className="w-full justify-start p-2 h-auto hover:bg-accent"
               >
-                <div className="flex items-center gap-3 w-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>U</AvatarFallback>
+                <div className="flex items-center gap-2 w-full min-w-0">
+                  <Avatar className="h-7 w-7 flex-shrink-0">
+                    <AvatarFallback className="text-xs">U</AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 text-left">
-                    <p className="text-sm font-medium">User</p>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-medium truncate">User</p>
                   </div>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuContent align="start" className="w-[200px]">
               <DropdownMenuItem onClick={() => router.push("/settings")}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
@@ -158,7 +151,7 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-full h-full border-r border-border/40 bg-card/50 backdrop-blur-sm">
+      <aside className="hidden md:flex w-full h-full border-r bg-sidebar/50 backdrop-blur-sm overflow-hidden">
         <SidebarContent />
       </aside>
 
@@ -169,7 +162,7 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
             <MessageSquare className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="w-72 sm:w-80 p-0">
           <SidebarContent />
         </SheetContent>
       </Sheet>

@@ -63,14 +63,14 @@ function ChatLayoutContent({ children }: { children: ReactNode }) {
               id="left-sidebar"
               order={1}
               defaultSize={leftSidebarSize}
-              minSize={15}
-              maxSize={40}
+              minSize={12}
+              maxSize={30}
               onResize={setLeftSidebarSize}
               className="hidden md:block"
             >
               <ChatSidebar onToggle={toggleLeftSidebar} />
             </Panel>
-            <PanelResizeHandle className="hidden md:block w-1 bg-transparent hover:bg-border/50 transition-colors relative before:absolute before:inset-y-0 before:left-1/2 before:-translate-x-1/2 before:w-3 before:hover:cursor-col-resize" />
+            <PanelResizeHandle className="hidden md:block w-1 bg-border/20 hover:bg-primary/20 transition-colors duration-150 relative before:absolute before:inset-y-0 before:left-1/2 before:-translate-x-1/2 before:w-4 before:hover:cursor-col-resize" />
           </>
         )}
         
@@ -89,8 +89,8 @@ function ChatLayoutContent({ children }: { children: ReactNode }) {
               id="right-sidebar"
               order={3}
               defaultSize={rightSidebarSize}
-              minSize={15}
-              maxSize={40}
+              minSize={12}
+              maxSize={30}
               onResize={setRightSidebarSize}
               className="hidden lg:block"
             >
