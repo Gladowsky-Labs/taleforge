@@ -23,6 +23,7 @@ export const list = query({
 export const create = mutation({
   args: {
     title: v.string(),
+    model: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -35,6 +36,7 @@ export const create = mutation({
       title: args.title,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      model: args.model || "gpt-4o-mini", // Default model
     });
 
     return chatId;

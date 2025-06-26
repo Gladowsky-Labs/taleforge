@@ -12,6 +12,7 @@ export default defineSchema({
     title: v.string(),
     createdAt: v.number(),
     updatedAt: v.number(),
+    model: v.optional(v.string()),
   }).index("by_user", ["userId"]),
 
   messages: defineTable({
@@ -20,5 +21,6 @@ export default defineSchema({
     content: v.string(),
     role: v.union(v.literal("user"), v.literal("assistant"), v.literal("system")),
     createdAt: v.number(),
+    model: v.optional(v.string()),
   }).index("by_chat", ["chatId"]),
 });

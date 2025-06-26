@@ -33,6 +33,7 @@ export const send = mutation({
     chatId: v.id("chats"),
     content: v.string(),
     role: v.union(v.literal("user"), v.literal("assistant"), v.literal("system")),
+    model: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -52,6 +53,7 @@ export const send = mutation({
       content: args.content,
       role: args.role,
       createdAt: Date.now(),
+      ...(args.model && { model: args.model }),
     });
 
     // Update chat's updatedAt timestamp

@@ -43,6 +43,7 @@ export const sendMessage = action({
         chatId: args.chatId,
         content: response.content,
         role: "assistant",
+        model: response.model,
       });
 
       // Update chat title if it's the first message
