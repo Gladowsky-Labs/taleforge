@@ -66,7 +66,11 @@ export default function ChatPage() {
     <div className="flex flex-col h-full bg-background">
       {/* Chat header */}
       <div className="border-b border-border/40 p-4 bg-card/50 backdrop-blur-sm flex-shrink-0">
-        <h1 className="text-lg font-semibold text-foreground">{chat.title}</h1>
+        <div className="flex items-center">
+          <div className="w-10 md:hidden" /> {/* Spacer for mobile toggle button */}
+          <h1 className="text-lg font-semibold text-foreground flex-1 text-center md:text-left">{chat.title}</h1>
+          <div className="w-10 lg:hidden" /> {/* Spacer for mobile settings button */}
+        </div>
       </div>
 
       {/* Messages area - simplified without nested ScrollArea */}

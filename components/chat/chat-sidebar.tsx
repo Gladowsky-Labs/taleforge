@@ -14,13 +14,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MessageSquare, Settings, LogOut, ChevronDown } from "lucide-react";
+import { Plus, MessageSquare, Settings, LogOut, ChevronDown, PanelLeftClose } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
 
-export function ChatSidebar() {
+interface ChatSidebarProps {
+  onToggle?: () => void;
+}
+
+export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
   const router = useRouter();
   const { signOut } = useAuthActions();
   const chats = useQuery(api.chats.list);
@@ -42,15 +45,28 @@ export function ChatSidebar() {
     <div className="flex h-screen flex-col">
       <div className="flex items-center justify-between p-4 flex-shrink-0">
         <h2 className="text-lg font-semibold">Chats</h2>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={handleCreateChat}
-          className="h-8 w-8"
-        >
-          <Plus className="h-4 w-4" />
-          <span className="sr-only">New chat</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={handleCreateChat}
+            className="h-8 w-8"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="sr-only">New chat</span>
+          </Button>
+          {onToggle && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={onToggle}
+              className="h-8 w-8"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+              <span className="sr-only">Close sidebar</span>
+            </Button>
+          )}
+        </div>
       </div>
       <Separator className="flex-shrink-0" />
       <ScrollArea className="flex-1 min-h-0">
@@ -114,7 +130,7 @@ export function ChatSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-64 border-r border-border/40 bg-card/50 backdrop-blur-sm h-screen">
+      <aside className="hidden md:flex w-full h-full border-r border-border/40 bg-card/50 backdrop-blur-sm">
         <SidebarContent />
       </aside>
 

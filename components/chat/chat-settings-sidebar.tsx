@@ -10,10 +10,14 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Settings2, Trash2, Edit2, Check, X } from "lucide-react";
+import { Settings2, Trash2, Edit2, Check, X, PanelRightClose } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
 
-export function ChatSettingsSidebar() {
+interface ChatSettingsSidebarProps {
+  onToggle?: () => void;
+}
+
+export function ChatSettingsSidebar({ onToggle }: ChatSettingsSidebarProps = {}) {
   const params = useParams();
   const chatId = params.chatId as Id<"chats"> | undefined;
   const chat = useQuery(api.chats.get, chatId ? { chatId } : "skip");
@@ -53,6 +57,17 @@ export function ChatSettingsSidebar() {
     <div className="flex h-screen flex-col">
       <div className="flex items-center justify-between p-4 flex-shrink-0">
         <h2 className="text-lg font-semibold">Chat Settings</h2>
+        {onToggle && (
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={onToggle}
+            className="h-8 w-8"
+          >
+            <PanelRightClose className="h-4 w-4" />
+            <span className="sr-only">Close sidebar</span>
+          </Button>
+        )}
       </div>
       <Separator className="flex-shrink-0" />
       {chat ? (
@@ -130,7 +145,7 @@ export function ChatSettingsSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-64 border-l border-border/40 bg-card/50 backdrop-blur-sm h-screen">
+      <aside className="hidden lg:flex w-full h-full border-l border-border/40 bg-card/50 backdrop-blur-sm">
         <SidebarContent />
       </aside>
 
