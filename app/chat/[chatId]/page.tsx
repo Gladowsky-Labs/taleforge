@@ -10,6 +10,8 @@ import { Bot, User, ArrowUp } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/contexts/sidebar-context";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function ChatPage() {
   const params = useParams();
@@ -163,7 +165,21 @@ export default function ChatPage() {
                     {message.role === "user" && (
                       <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover/message:opacity-100 transition-opacity duration-150" />
                     )}
-                    <p className="text-[16px] leading-relaxed whitespace-pre-wrap font-medium relative z-10">{message.content}</p>
+                    <div className="text-[16px] leading-relaxed font-medium relative z-10 prose prose-sm max-w-none
+                      prose-p:my-2 prose-headings:mt-4 prose-headings:mb-2 
+                      prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg
+                      prose-code:bg-black/10 prose-code:rounded prose-code:px-1 prose-code:py-0.5 prose-code:text-sm
+                      prose-pre:bg-black/10 prose-pre:rounded-lg prose-pre:p-4 prose-pre:overflow-x-auto
+                      prose-ul:my-2 prose-ol:my-2 prose-li:my-1
+                      prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic
+                      prose-a:text-primary prose-a:underline
+                      prose-strong:font-bold prose-em:italic
+                      prose-table:border-collapse prose-td:border prose-td:p-2 prose-th:border prose-th:p-2
+                      dark:prose-invert
+                      data-[user=true]:prose-invert data-[user=true]:prose-code:bg-white/20 data-[user=true]:prose-pre:bg-white/20"
+                      data-user={message.role === "user"}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
+                    </div>
                   </div>
                 </div>
                 <div className={cn(
