@@ -27,15 +27,17 @@ export function CreateUniverseChatDialog({
 }: CreateUniverseChatDialogProps) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("universe");
-  const [selectedUniverseId, setSelectedUniverseId] = useState<Id<"universes">>();
+  const [selectedUniverseId, setSelectedUniverseId] = useState<Id<"universes"> | Id<"customUniverses">>();
+  const [selectedIsCustomUniverse, setSelectedIsCustomUniverse] = useState(false);
   const [selectedCharacterId, setSelectedCharacterId] = useState<Id<"characters">>();
   const [selectedCustomCharacterId, setSelectedCustomCharacterId] = useState<Id<"customCharacters">>();
   const [isCreating, setIsCreating] = useState(false);
   
   const createChat = useMutation(api.chats.create);
 
-  const handleUniverseSelect = (universeId: Id<"universes">) => {
+  const handleUniverseSelect = (universeId: Id<"universes"> | Id<"customUniverses">, isCustom: boolean) => {
     setSelectedUniverseId(universeId);
+    setSelectedIsCustomUniverse(isCustom);
     // Reset character selection when universe changes
     setSelectedCharacterId(undefined);
     setSelectedCustomCharacterId(undefined);
@@ -72,7 +74,8 @@ export function CreateUniverseChatDialog({
     try {
       const chatId = await createChat({
         title: "New Adventure", // Will be auto-generated from first message
-        universeId: selectedUniverseId,
+        universeId: selectedIsCustomUniverse ? undefined : selectedUniverseId as Id<"universes">,
+        customUniverseId: selectedIsCustomUniverse ? selectedUniverseId as Id<"customUniverses"> : undefined,
         characterId: selectedCharacterId,
         customCharacterId: selectedCustomCharacterId,
       });
@@ -83,6 +86,7 @@ export function CreateUniverseChatDialog({
       // Reset state
       setStep("universe");
       setSelectedUniverseId(undefined);
+      setSelectedIsCustomUniverse(false);
       setSelectedCharacterId(undefined);
       setSelectedCustomCharacterId(undefined);
     } catch (error) {
@@ -143,12 +147,14 @@ export function CreateUniverseChatDialog({
             <UniverseSelector 
               onSelect={handleUniverseSelect}
               selectedUniverseId={selectedUniverseId}
+              selectedIsCustom={selectedIsCustomUniverse}
             />
           )}
           
           {step === "character" && selectedUniverseId && (
             <CharacterSelector
-              universeId={selectedUniverseId}
+              universeId={selectedIsCustomUniverse ? undefined : selectedUniverseId as Id<"universes">}
+              customUniverseId={selectedIsCustomUniverse ? selectedUniverseId as Id<"customUniverses"> : undefined}
               onSelect={handleCharacterSelect}
               selectedCharacterId={selectedCharacterId}
               selectedCustomCharacterId={selectedCustomCharacterId}

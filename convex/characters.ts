@@ -1,6 +1,20 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+export const listAllProtagonists = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("characters")
+      .filter((q) => q.and(
+        q.eq(q.field("isActive"), true),
+        q.eq(q.field("isProtagonist"), true)
+      ))
+      .order("desc")
+      .collect();
+  },
+});
+
 export const listByUniverse = query({
   args: { universeId: v.id("universes") },
   handler: async (ctx, args) => {
@@ -63,6 +77,19 @@ export const create = mutation({
   },
 });
 
+export const listAllCustomByUser = query({
+  args: { 
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("customCharacters")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .order("desc")
+      .collect();
+  },
+});
+
 export const listCustomByUser = query({
   args: { 
     userId: v.id("users"),
@@ -94,10 +121,27 @@ export const getCustom = query({
   },
 });
 
+export const listCustomByUserAndCustomUniverse = query({
+  args: { 
+    userId: v.id("users"),
+    customUniverseId: v.id("customUniverses"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("customCharacters")
+      .withIndex("by_user_custom_universe", (q) => 
+        q.eq("userId", args.userId).eq("customUniverseId", args.customUniverseId)
+      )
+      .order("desc")
+      .collect();
+  },
+});
+
 export const createCustom = mutation({
   args: {
     userId: v.id("users"),
-    universeId: v.id("universes"),
+    universeId: v.optional(v.id("universes")),
+    customUniverseId: v.optional(v.id("customUniverses")),
     name: v.string(),
     description: v.string(),
     personality: v.optional(v.string()),
@@ -107,9 +151,15 @@ export const createCustom = mutation({
   handler: async (ctx, args) => {
     const now = Date.now();
     
+    // Ensure either universeId or customUniverseId is provided
+    if (!args.universeId && !args.customUniverseId) {
+      throw new Error("Either universeId or customUniverseId must be provided");
+    }
+    
     return await ctx.db.insert("customCharacters", {
       userId: args.userId,
       universeId: args.universeId,
+      customUniverseId: args.customUniverseId,
       name: args.name,
       description: args.description,
       personality: args.personality,

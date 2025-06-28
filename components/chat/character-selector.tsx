@@ -15,7 +15,8 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface CharacterSelectorProps {
-  universeId: Id<"universes">;
+  universeId?: Id<"universes">;
+  customUniverseId?: Id<"customUniverses">;
   onSelect: (characterId?: Id<"characters">, customCharacterId?: Id<"customCharacters">) => void;
   selectedCharacterId?: Id<"characters">;
   selectedCustomCharacterId?: Id<"customCharacters">;
@@ -24,6 +25,7 @@ interface CharacterSelectorProps {
 
 export function CharacterSelector({ 
   universeId, 
+  customUniverseId,
   onSelect, 
   selectedCharacterId, 
   selectedCustomCharacterId,
@@ -38,11 +40,10 @@ export function CharacterSelector({
     specialAbilities: [] as string[],
   });
   
-  const protagonists = useQuery(api.characters.getProtagonists, { universeId });
-  const customCharacters = useQuery(api.characters.listCustomByUser, { 
-    userId, 
-    universeId 
-  });
+  // Get all protagonists from all universes
+  const allProtagonists = useQuery(api.characters.listAllProtagonists);
+  // Get all custom characters for this user
+  const allCustomCharacters = useQuery(api.characters.listAllCustomByUser, { userId });
   const createCustomCharacter = useMutation(api.characters.createCustom);
 
   const handleCreateCustom = async () => {
@@ -51,7 +52,8 @@ export function CharacterSelector({
     try {
       const newCharacterId = await createCustomCharacter({
         userId,
-        universeId,
+        universeId: undefined, // No longer linking to specific universe
+        customUniverseId: undefined, // No longer linking to specific custom universe
         name: customCharacter.name,
         description: customCharacter.description,
         personality: customCharacter.personality || undefined,
@@ -80,7 +82,9 @@ export function CharacterSelector({
     setCustomCharacter(prev => ({ ...prev, specialAbilities: abilities }));
   };
 
-  if (!protagonists && !customCharacters) {
+  // No need for this line anymore since we're getting all custom characters directly
+  
+  if (!allProtagonists && !allCustomCharacters) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -96,7 +100,7 @@ export function CharacterSelector({
           Choose Your Character
         </h2>
         <p className="text-muted-foreground">
-          Play as the original protagonist or create your own character
+          Choose any character to play as - they can be used in any universe
         </p>
       </div>
 
@@ -104,14 +108,14 @@ export function CharacterSelector({
         <div className="space-y-6">
           
           {/* Protagonist Characters */}
-          {protagonists && protagonists.length > 0 && (
+          {allProtagonists && allProtagonists.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <Crown className="h-5 w-5 text-amber-500" />
-                Original Protagonists
+                Protagonist Characters
               </h3>
               <div className="space-y-3">
-                {protagonists.map((character) => (
+                {allProtagonists.map((character) => (
                   <Card 
                     key={character._id}
                     className={`cursor-pointer transition-all hover:shadow-lg ${
@@ -178,7 +182,7 @@ export function CharacterSelector({
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-purple-500" />
-                Your Custom Characters
+                Your Characters
               </h3>
               <Dialog open={showCreateCustom} onOpenChange={setShowCreateCustom}>
                 <DialogTrigger asChild>
@@ -256,9 +260,9 @@ export function CharacterSelector({
               </Dialog>
             </div>
             
-            {customCharacters && customCharacters.length > 0 ? (
+            {allCustomCharacters && allCustomCharacters.length > 0 ? (
               <div className="space-y-3">
-                {customCharacters.map((character) => (
+                {allCustomCharacters.map((character) => (
                   <Card 
                     key={character._id}
                     className={`cursor-pointer transition-all hover:shadow-lg ${
@@ -321,7 +325,7 @@ export function CharacterSelector({
               <Card className="p-6 text-center border-dashed">
                 <UserPlus className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
                 <p className="text-sm text-muted-foreground">
-                  No custom characters yet. Create your first character to get started!
+                  No custom characters yet. Create your first character - they can be used in any universe!
                 </p>
               </Card>
             )}

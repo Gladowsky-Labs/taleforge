@@ -17,6 +17,7 @@ import type * as auth from "../auth.js";
 import type * as characters from "../characters.js";
 import type * as chat from "../chat.js";
 import type * as chats from "../chats.js";
+import type * as customUniverses from "../customUniverses.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as openai from "../openai.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   characters: typeof characters;
   chat: typeof chat;
   chats: typeof chats;
+  customUniverses: typeof customUniverses;
   http: typeof http;
   messages: typeof messages;
   openai: typeof openai;

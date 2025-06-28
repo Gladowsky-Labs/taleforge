@@ -35,7 +35,8 @@ export default defineSchema({
 
   customCharacters: defineTable({
     userId: v.id("users"),
-    universeId: v.id("universes"),
+    universeId: v.optional(v.id("universes")),
+    customUniverseId: v.optional(v.id("customUniverses")),
     name: v.string(),
     description: v.string(),
     personality: v.optional(v.string()),
@@ -44,19 +45,34 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user_universe", ["userId", "universeId"])
+    .index("by_user_custom_universe", ["userId", "customUniverseId"])
     .index("by_user", ["userId"]),
+
+  customUniverses: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    description: v.string(),
+    systemPrompt: v.string(),
+    gameInstructions: v.optional(v.string()),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"])
+    .index("by_user_active", ["userId", "isActive"]),
 
   chats: defineTable({
     userId: v.id("users"),
     title: v.string(),
     universeId: v.optional(v.id("universes")),
+    customUniverseId: v.optional(v.id("customUniverses")),
     characterId: v.optional(v.id("characters")),
     customCharacterId: v.optional(v.id("customCharacters")),
     createdAt: v.number(),
     updatedAt: v.number(),
     model: v.optional(v.string()),
   }).index("by_user", ["userId"])
-    .index("by_universe", ["universeId"]),
+    .index("by_universe", ["universeId"])
+    .index("by_custom_universe", ["customUniverseId"]),
 
   messages: defineTable({
     chatId: v.id("chats"),

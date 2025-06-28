@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings2, Trash2, Edit2, Check, X, PanelRightClose, Globe, User, Info } from "lucide-react";
+import { Settings2, Trash2, Edit2, Check, X, PanelRightClose, Globe, User, Info, Plus } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
+import { CreateCharacterDialog } from "./create-character-dialog";
+import { CreateUniverseDialog } from "./create-universe-dialog";
 
 interface ChatSettingsSidebarProps {
   onToggle?: () => void;
@@ -26,6 +28,7 @@ export function ChatSettingsSidebar({ onToggle }: ChatSettingsSidebarProps = {})
   
   // Fetch related data
   const universe = useQuery(api.universes.get, chat?.universeId ? { id: chat.universeId } : "skip");
+  const customUniverse = useQuery(api.customUniverses.get, chat?.customUniverseId ? { id: chat.customUniverseId } : "skip");
   const character = useQuery(api.characters.get, chat?.characterId ? { id: chat.characterId } : "skip");
   const customCharacter = useQuery(api.characters.getCustom, chat?.customCharacterId ? { id: chat.customCharacterId } : "skip");
   const messageCount = useQuery(api.messages.count, chatId ? { chatId } : "skip");
@@ -33,6 +36,10 @@ export function ChatSettingsSidebar({ onToggle }: ChatSettingsSidebarProps = {})
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
+  const [showCreateCharacter, setShowCreateCharacter] = useState(false);
+  const [showCreateUniverse, setShowCreateUniverse] = useState(false);
+  
+  const currentUser = useQuery(api.users.currentUser);
 
   const handleEditStart = () => {
     if (chat) {
@@ -83,7 +90,7 @@ export function ChatSettingsSidebar({ onToggle }: ChatSettingsSidebarProps = {})
               <Info className="h-3 w-3 mr-1" />
               Info
             </TabsTrigger>
-            <TabsTrigger value="universe" className="text-xs" disabled={!chat.universeId}>
+            <TabsTrigger value="universe" className="text-xs" disabled={!chat.universeId && !chat.customUniverseId}>
               <Globe className="h-3 w-3 mr-1" />
               Universe
             </TabsTrigger>
@@ -158,11 +165,12 @@ export function ChatSettingsSidebar({ onToggle }: ChatSettingsSidebarProps = {})
                   </p>
                 </div>
 
-                {chat.universeId && (
+                {(chat.universeId || chat.customUniverseId) && (
                   <div className="space-y-1">
                     <Label className="text-sm">Universe</Label>
                     <p className="text-sm text-muted-foreground">
-                      {universe?.name || "Loading..."}
+                      {universe?.name || customUniverse?.name || "Loading..."}
+                      {chat.customUniverseId && " (Custom)"}
                     </p>
                   </div>
                 )}
@@ -182,25 +190,28 @@ export function ChatSettingsSidebar({ onToggle }: ChatSettingsSidebarProps = {})
 
           <TabsContent value="universe" className="flex-1 overflow-hidden mt-0">
             <ScrollArea className="h-full">
-              {universe ? (
+              {universe || customUniverse ? (
                 <div className="p-3 space-y-4 w-full">
                   <div className="space-y-1">
                     <Label className="text-sm">Universe Name</Label>
-                    <p className="text-sm font-medium">{universe.name}</p>
+                    <p className="text-sm font-medium">
+                      {universe?.name || customUniverse?.name}
+                      {customUniverse && " (Custom)"}
+                    </p>
                   </div>
 
                   <div className="space-y-1">
                     <Label className="text-sm">Description</Label>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {universe.description}
+                      {universe?.description || customUniverse?.description}
                     </p>
                   </div>
 
-                  {universe.gameInstructions && (
+                  {(universe?.gameInstructions || customUniverse?.gameInstructions) && (
                     <div className="space-y-1">
                       <Label className="text-sm">Game Instructions</Label>
                       <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                        {universe.gameInstructions}
+                        {universe?.gameInstructions || customUniverse?.gameInstructions}
                       </p>
                     </div>
                   )}
@@ -208,7 +219,7 @@ export function ChatSettingsSidebar({ onToggle }: ChatSettingsSidebarProps = {})
                   <div className="space-y-1">
                     <Label className="text-sm">System Prompt</Label>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap font-mono text-xs bg-muted p-2 rounded">
-                      {universe.systemPrompt}
+                      {universe?.systemPrompt || customUniverse?.systemPrompt}
                     </p>
                   </div>
                 </div>
@@ -289,6 +300,26 @@ export function ChatSettingsSidebar({ onToggle }: ChatSettingsSidebarProps = {})
             <ScrollArea className="h-full">
               <div className="p-3 space-y-4 w-full">
                 <div className="space-y-2 w-full">
+                  <Label className="text-sm">Create New Content</Label>
+                  <Button
+                    variant="outline"
+                    className="w-full h-9 text-sm"
+                    onClick={() => setShowCreateCharacter(true)}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Character
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full h-9 text-sm"
+                    onClick={() => setShowCreateUniverse(true)}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Universe
+                  </Button>
+                </div>
+                
+                <div className="space-y-2 w-full">
                   <Label className="text-sm text-destructive">Danger Zone</Label>
                   <Button
                     variant="destructive"
@@ -331,6 +362,22 @@ export function ChatSettingsSidebar({ onToggle }: ChatSettingsSidebarProps = {})
           <SidebarContent />
         </SheetContent>
       </Sheet>
+      
+      {/* Dialogs */}
+      {currentUser && (
+        <>
+          <CreateCharacterDialog
+            open={showCreateCharacter}
+            onOpenChange={setShowCreateCharacter}
+            userId={currentUser._id}
+          />
+          <CreateUniverseDialog
+            open={showCreateUniverse}
+            onOpenChange={setShowCreateUniverse}
+            userId={currentUser._id}
+          />
+        </>
+      )}
     </>
   );
 }

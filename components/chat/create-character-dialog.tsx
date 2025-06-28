@@ -55,13 +55,14 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
   };
 
   const handleCreateCharacter = async () => {
-    if (!name.trim() || !description.trim() || !selectedUniverseId) return;
+    if (!name.trim() || !description.trim()) return;
 
     setIsCreating(true);
     try {
       await createCustomCharacter({
         userId,
-        universeId: selectedUniverseId,
+        universeId: selectedUniverseId || undefined,
+        customUniverseId: undefined, // Not setting custom universe from this dialog
         name: name.trim(),
         description: description.trim(),
         personality: personality.trim() || undefined,
@@ -101,12 +102,13 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="universe">Universe</Label>
-            <Select value={selectedUniverseId || ""} onValueChange={(value) => setSelectedUniverseId(value as Id<"universes">)}>
+            <Label htmlFor="universe">Universe (Optional)</Label>
+            <Select value={selectedUniverseId || ""} onValueChange={(value) => setSelectedUniverseId(value === "none" ? null : value as Id<"universes">)}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a universe" />
+                <SelectValue placeholder="Select a universe (optional)" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">No specific universe</SelectItem>
                 {universes?.map((universe) => (
                   <SelectItem key={universe._id} value={universe._id}>
                     {universe.name}
@@ -114,6 +116,9 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
                 ))}
               </SelectContent>
             </Select>
+            <p className="text-sm text-muted-foreground">
+              Leave blank to create a character that can be used in any universe.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -205,7 +210,7 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
           </Button>
           <Button 
             onClick={handleCreateCharacter}
-            disabled={!name.trim() || !description.trim() || !selectedUniverseId || isCreating}
+            disabled={!name.trim() || !description.trim() || isCreating}
           >
             {isCreating ? "Creating..." : "Create Character"}
           </Button>
