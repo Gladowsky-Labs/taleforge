@@ -22,7 +22,7 @@ interface CreateUniverseDialogProps {
   userId: Id<"users">;
 }
 
-export function CreateUniverseDialog({ open, onOpenChange, userId }: CreateUniverseDialogProps) {
+export function CreateUniverseDialog({ open, onOpenChange }: CreateUniverseDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");

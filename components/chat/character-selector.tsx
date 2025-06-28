@@ -24,8 +24,6 @@ interface CharacterSelectorProps {
 }
 
 export function CharacterSelector({ 
-  universeId, 
-  customUniverseId,
   onSelect, 
   selectedCharacterId, 
   selectedCustomCharacterId,
