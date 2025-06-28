@@ -14,12 +14,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MessageSquare, Settings, LogOut, ChevronDown, PanelLeftClose, X, Sparkles, UserPlus } from "lucide-react";
+import { MessageSquare, Settings, LogOut, ChevronDown, PanelLeftClose, X, Sparkles, UserPlus, Globe } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CreateUniverseChatDialog } from "./create-universe-chat-dialog";
 import { CreateCharacterDialog } from "./create-character-dialog";
+import { CreateUniverseDialog } from "./create-universe-dialog";
 
 interface ChatSidebarProps {
   onToggle?: () => void;
@@ -33,6 +34,7 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
   const deleteChat = useMutation(api.chats.remove);
   const [showUniverseDialog, setShowUniverseDialog] = useState(false);
   const [showCharacterDialog, setShowCharacterDialog] = useState(false);
+  const [showCreateUniverseDialog, setShowCreateUniverseDialog] = useState(false);
   
   // Get current user ID for universe chat creation
   const currentUser = useQuery(api.users.currentUser);
@@ -78,6 +80,15 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
           >
             <Sparkles className="h-4 w-4 mr-2" />
             New Adventure
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowCreateUniverseDialog(true)}
+            className="w-full justify-start"
+          >
+            <Globe className="h-4 w-4 mr-2" />
+            New Universe
           </Button>
           <Button
             size="sm"
@@ -194,6 +205,15 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
         <CreateCharacterDialog
           open={showCharacterDialog}
           onOpenChange={setShowCharacterDialog}
+          userId={currentUser._id}
+        />
+      )}
+
+      {/* Universe Creation Dialog */}
+      {currentUser?._id && (
+        <CreateUniverseDialog
+          open={showCreateUniverseDialog}
+          onOpenChange={setShowCreateUniverseDialog}
           userId={currentUser._id}
         />
       )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import {
@@ -14,15 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { X, Wand2 } from "lucide-react";
 
 interface CreateCharacterDialogProps {
   open: boolean;
@@ -31,7 +24,6 @@ interface CreateCharacterDialogProps {
 }
 
 export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateCharacterDialogProps) {
-  const [selectedUniverseId, setSelectedUniverseId] = useState<Id<"universes"> | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [personality, setPersonality] = useState("");
@@ -39,9 +31,10 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
   const [specialAbilities, setSpecialAbilities] = useState<string[]>([]);
   const [newAbility, setNewAbility] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const universes = useQuery(api.universes.list);
   const createCustomCharacter = useMutation(api.characters.createCustom);
+  const generateContent = useAction(api.openai.generateContent);
 
   const handleAddAbility = () => {
     if (newAbility.trim() && !specialAbilities.includes(newAbility.trim())) {
@@ -54,14 +47,70 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
     setSpecialAbilities(specialAbilities.filter(a => a !== ability));
   };
 
+  const generateAllContent = async () => {
+    if (!name.trim()) return;
+    
+    setIsGenerating(true);
+    try {
+      // Generate all fields sequentially for better coherence
+      const descriptionResult = await generateContent({
+        type: 'character',
+        field: 'description',
+        prompt: name.trim(),
+        context: { name: name || undefined }
+      });
+      setDescription(descriptionResult.content);
+
+      const personalityResult = await generateContent({
+        type: 'character',
+        field: 'personality',
+        prompt: name.trim(),
+        context: { 
+          name: name || undefined,
+          description: descriptionResult.content || undefined
+        }
+      });
+      setPersonality(personalityResult.content);
+
+      const backstoryResult = await generateContent({
+        type: 'character',
+        field: 'backstory',
+        prompt: name.trim(),
+        context: { 
+          name: name || undefined,
+          description: descriptionResult.content || undefined,
+          personality: personalityResult.content || undefined
+        }
+      });
+      setBackstory(backstoryResult.content);
+
+      const abilitiesResult = await generateContent({
+        type: 'character',
+        field: 'abilities',
+        prompt: name.trim(),
+        context: { 
+          name: name || undefined,
+          description: descriptionResult.content || undefined,
+          personality: personalityResult.content || undefined
+        }
+      });
+      const abilities = abilitiesResult.content.split('\n').map((a: string) => a.trim()).filter((a: string) => a);
+      setSpecialAbilities(abilities);
+
+    } catch (error) {
+      console.error('Failed to generate AI content:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleCreateCharacter = async () => {
-    if (!name.trim() || !description.trim() || !selectedUniverseId) return;
+    if (!name.trim() || !description.trim()) return;
 
     setIsCreating(true);
     try {
       await createCustomCharacter({
         userId,
-        universeId: selectedUniverseId,
         name: name.trim(),
         description: description.trim(),
         personality: personality.trim() || undefined,
@@ -76,7 +125,6 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
       setBackstory("");
       setSpecialAbilities([]);
       setNewAbility("");
-      setSelectedUniverseId(null);
       
       onOpenChange(false);
     } catch (error) {
@@ -101,23 +149,20 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="universe">Universe</Label>
-            <Select value={selectedUniverseId || ""} onValueChange={(value) => setSelectedUniverseId(value as Id<"universes">)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a universe" />
-              </SelectTrigger>
-              <SelectContent>
-                {universes?.map((universe) => (
-                  <SelectItem key={universe._id} value={universe._id}>
-                    {universe.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="name">Character Name *</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="name">Character Name *</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!name.trim() || isGenerating}
+                onClick={generateAllContent}
+                className="h-8 px-3 text-sm"
+              >
+                <Wand2 className="h-4 w-4 mr-2" />
+                {isGenerating ? 'Generating All...' : 'Fill All Fields'}
+              </Button>
+            </div>
             <Input
               id="name"
               value={name}
@@ -125,6 +170,9 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
               placeholder="Enter character name"
               onKeyDown={handleKeyPress}
             />
+            <p className="text-sm text-muted-foreground">
+              Enter a character name and click &quot;Fill All Fields&quot; to auto-generate all character details with AI.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -205,7 +253,7 @@ export function CreateCharacterDialog({ open, onOpenChange, userId }: CreateChar
           </Button>
           <Button 
             onClick={handleCreateCharacter}
-            disabled={!name.trim() || !description.trim() || !selectedUniverseId || isCreating}
+            disabled={!name.trim() || !description.trim() || isCreating}
           >
             {isCreating ? "Creating..." : "Create Character"}
           </Button>

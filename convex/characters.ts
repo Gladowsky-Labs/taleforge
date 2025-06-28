@@ -1,6 +1,20 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+export const listAllProtagonists = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("characters")
+      .filter((q) => q.and(
+        q.eq(q.field("isActive"), true),
+        q.eq(q.field("isProtagonist"), true)
+      ))
+      .order("desc")
+      .collect();
+  },
+});
+
 export const listByUniverse = query({
   args: { universeId: v.id("universes") },
   handler: async (ctx, args) => {
@@ -63,27 +77,29 @@ export const create = mutation({
   },
 });
 
+export const listAllCustomByUser = query({
+  args: { 
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("customCharacters")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .order("desc")
+      .collect();
+  },
+});
+
 export const listCustomByUser = query({
   args: { 
     userId: v.id("users"),
-    universeId: v.optional(v.id("universes")),
   },
   handler: async (ctx, args) => {
-    if (args.universeId) {
-      return await ctx.db
-        .query("customCharacters")
-        .withIndex("by_user_universe", (q) => 
-          q.eq("userId", args.userId).eq("universeId", args.universeId!)
-        )
-        .order("desc")
-        .collect();
-    } else {
-      return await ctx.db
-        .query("customCharacters")
-        .withIndex("by_user", (q) => q.eq("userId", args.userId))
-        .order("desc")
-        .collect();
-    }
+    return await ctx.db
+      .query("customCharacters")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .order("desc")
+      .collect();
   },
 });
 
@@ -94,10 +110,10 @@ export const getCustom = query({
   },
 });
 
+
 export const createCustom = mutation({
   args: {
     userId: v.id("users"),
-    universeId: v.id("universes"),
     name: v.string(),
     description: v.string(),
     personality: v.optional(v.string()),
@@ -105,11 +121,11 @@ export const createCustom = mutation({
     specialAbilities: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
+    console.log("createCustom called with args:", args);
     const now = Date.now();
     
     return await ctx.db.insert("customCharacters", {
       userId: args.userId,
-      universeId: args.universeId,
       name: args.name,
       description: args.description,
       personality: args.personality,
