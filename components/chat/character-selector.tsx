@@ -52,8 +52,6 @@ export function CharacterSelector({
     try {
       const newCharacterId = await createCustomCharacter({
         userId,
-        universeId: undefined, // No longer linking to specific universe
-        customUniverseId: undefined, // No longer linking to specific custom universe
         name: customCharacter.name,
         description: customCharacter.description,
         personality: customCharacter.personality || undefined,

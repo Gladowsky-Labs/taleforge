@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import {
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Wand2 } from "lucide-react";
 
 interface CreateUniverseDialogProps {
   open: boolean;
@@ -27,8 +28,54 @@ export function CreateUniverseDialog({ open, onOpenChange, userId }: CreateUnive
   const [systemPrompt, setSystemPrompt] = useState("");
   const [gameInstructions, setGameInstructions] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const createCustomUniverse = useMutation(api.customUniverses.create);
+  const generateContent = useAction(api.openai.generateContent);
+
+  const generateAllContent = async () => {
+    if (!name.trim()) return;
+    
+    setIsGenerating(true);
+    try {
+      // Generate all fields sequentially for better coherence
+      const descriptionResult = await generateContent({
+        type: 'universe',
+        field: 'description',
+        prompt: name.trim(),
+        context: { name: name || undefined }
+      });
+      setDescription(descriptionResult.content);
+
+      const systemPromptResult = await generateContent({
+        type: 'universe',
+        field: 'systemPrompt',
+        prompt: name.trim(),
+        context: { 
+          name: name || undefined,
+          description: descriptionResult.content || undefined
+        }
+      });
+      setSystemPrompt(systemPromptResult.content);
+
+      const gameInstructionsResult = await generateContent({
+        type: 'universe',
+        field: 'gameInstructions',
+        prompt: name.trim(),
+        context: { 
+          name: name || undefined,
+          description: descriptionResult.content || undefined,
+          systemPrompt: systemPromptResult.content || undefined
+        }
+      });
+      setGameInstructions(gameInstructionsResult.content);
+
+    } catch (error) {
+      console.error('Failed to generate AI content:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleCreateUniverse = async () => {
     if (!name.trim() || !description.trim() || !systemPrompt.trim()) return;
@@ -71,7 +118,20 @@ export function CreateUniverseDialog({ open, onOpenChange, userId }: CreateUnive
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Universe Name *</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="name">Universe Name *</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!name.trim() || isGenerating}
+                onClick={generateAllContent}
+                className="h-8 px-3 text-sm"
+              >
+                <Wand2 className="h-4 w-4 mr-2" />
+                {isGenerating ? 'Generating All...' : 'Fill All Fields'}
+              </Button>
+            </div>
             <Input
               id="name"
               value={name}
@@ -79,6 +139,9 @@ export function CreateUniverseDialog({ open, onOpenChange, userId }: CreateUnive
               placeholder="Enter universe name"
               onKeyDown={handleKeyPress}
             />
+            <p className="text-sm text-muted-foreground">
+              Enter a universe name and click &quot;Fill All Fields&quot; to auto-generate all universe details with AI.
+            </p>
           </div>
 
           <div className="space-y-2">

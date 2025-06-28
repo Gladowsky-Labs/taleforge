@@ -42,6 +42,7 @@ export const sendMessage = action({
       // Build context with universe and character information
       let systemPrompt = "";
       
+      // Handle regular universes
       if (chat.universeId) {
         const universe = await ctx.runQuery(api.universes.get, {
           id: chat.universeId,
@@ -53,51 +54,89 @@ export const sendMessage = action({
           if (universe.gameInstructions) {
             systemPrompt += "\n\n" + universe.gameInstructions;
           }
+        }
+      }
+      // Handle custom universes
+      else if (chat.customUniverseId) {
+        const customUniverse = await ctx.runQuery(api.customUniverses.get, {
+          id: chat.customUniverseId,
+        });
+        
+        if (customUniverse) {
+          systemPrompt += customUniverse.systemPrompt;
           
-          // Add character context
-          if (chat.characterId) {
-            const character = await ctx.runQuery(api.characters.get, {
-              id: chat.characterId,
-            });
-            
-            if (character) {
-              systemPrompt += `\n\nThe player is playing as: ${character.name}`;
-              systemPrompt += `\nCharacter description: ${character.description}`;
-              
-              if (character.personality) {
-                systemPrompt += `\nPersonality: ${character.personality}`;
-              }
-              
-              if (character.backstory) {
-                systemPrompt += `\nBackstory: ${character.backstory}`;
-              }
-              
-              if (character.specialAbilities?.length) {
-                systemPrompt += `\nSpecial abilities: ${character.specialAbilities.join(", ")}`;
-              }
-            }
-          } else if (chat.customCharacterId) {
-            const customCharacter = await ctx.runQuery(api.characters.getCustom, {
-              id: chat.customCharacterId,
-            });
-            
-            if (customCharacter) {
-              systemPrompt += `\n\nThe player is playing as their custom character: ${customCharacter.name}`;
-              systemPrompt += `\nCharacter description: ${customCharacter.description}`;
-              
-              if (customCharacter.personality) {
-                systemPrompt += `\nPersonality: ${customCharacter.personality}`;
-              }
-              
-              if (customCharacter.backstory) {
-                systemPrompt += `\nBackstory: ${customCharacter.backstory}`;
-              }
-              
-              if (customCharacter.specialAbilities?.length) {
-                systemPrompt += `\nSpecial abilities: ${customCharacter.specialAbilities.join(", ")}`;
-              }
-            }
+          if (customUniverse.gameInstructions) {
+            systemPrompt += "\n\n" + customUniverse.gameInstructions;
           }
+        }
+      }
+      
+      // Add character context and narrative instructions
+      if (systemPrompt) {
+        systemPrompt += `\n\n--- NARRATIVE INSTRUCTIONS ---
+You are an expert storyteller and game master. Your role is to narrate an immersive interactive story where the user embodies their chosen character. Follow these guidelines:
+
+1. NARRATIVE STYLE: Write in third person, describing scenes, environments, other characters, and events happening around the user's character.
+
+2. USER IS THE CHARACTER: The user's messages represent their character speaking and acting. Respond to their actions and dialogue as if they ARE their character.
+
+3. STORY PROGRESSION: Continuously advance the plot, introduce interesting scenarios, conflicts, and opportunities for character development.
+
+4. PROVIDE CHOICES: End most responses with 2-4 specific action options the character could take next, formatted as numbered choices.
+
+5. IMMERSIVE DESCRIPTIONS: Use vivid, sensory details to bring the world to life - sights, sounds, smells, atmosphere.
+
+6. RESPOND TO CHARACTER ACTIONS: When the user speaks or acts as their character, describe the immediate consequences and reactions from the world around them.`;
+      }
+      
+      // Add character context (works for both regular and custom universes)
+      if (chat.characterId) {
+        const character = await ctx.runQuery(api.characters.get, {
+          id: chat.characterId,
+        });
+        
+        if (character) {
+          systemPrompt += `\n\n--- CHARACTER DETAILS ---
+The user is embodying: ${character.name}
+Description: ${character.description}`;
+          
+          if (character.personality) {
+            systemPrompt += `\nPersonality: ${character.personality}`;
+          }
+          
+          if (character.backstory) {
+            systemPrompt += `\nBackstory: ${character.backstory}`;
+          }
+          
+          if (character.specialAbilities?.length) {
+            systemPrompt += `\nSpecial abilities: ${character.specialAbilities.join(", ")}`;
+          }
+          
+          systemPrompt += `\n\nRemember: When the user speaks, they are speaking AS ${character.name}. When they describe actions, they are acting AS ${character.name}. Respond accordingly by describing how the world reacts to ${character.name}'s words and actions.`;
+        }
+      } else if (chat.customCharacterId) {
+        const customCharacter = await ctx.runQuery(api.characters.getCustom, {
+          id: chat.customCharacterId,
+        });
+        
+        if (customCharacter) {
+          systemPrompt += `\n\n--- CHARACTER DETAILS ---
+The user is embodying their custom character: ${customCharacter.name}
+Description: ${customCharacter.description}`;
+          
+          if (customCharacter.personality) {
+            systemPrompt += `\nPersonality: ${customCharacter.personality}`;
+          }
+          
+          if (customCharacter.backstory) {
+            systemPrompt += `\nBackstory: ${customCharacter.backstory}`;
+          }
+          
+          if (customCharacter.specialAbilities?.length) {
+            systemPrompt += `\nSpecial abilities: ${customCharacter.specialAbilities.join(", ")}`;
+          }
+          
+          systemPrompt += `\n\nRemember: When the user speaks, they are speaking AS ${customCharacter.name}. When they describe actions, they are acting AS ${customCharacter.name}. Respond accordingly by describing how the world reacts to ${customCharacter.name}'s words and actions.`;
         }
       }
 

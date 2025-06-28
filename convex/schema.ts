@@ -35,8 +35,6 @@ export default defineSchema({
 
   customCharacters: defineTable({
     userId: v.id("users"),
-    universeId: v.optional(v.id("universes")),
-    customUniverseId: v.optional(v.id("customUniverses")),
     name: v.string(),
     description: v.string(),
     personality: v.optional(v.string()),
@@ -44,9 +42,8 @@ export default defineSchema({
     specialAbilities: v.optional(v.array(v.string())),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("by_user_universe", ["userId", "universeId"])
-    .index("by_user_custom_universe", ["userId", "customUniverseId"])
-    .index("by_user", ["userId"]),
+    // Updated: removed universeId and customUniverseId fields
+  }).index("by_user", ["userId"]),
 
   customUniverses: defineTable({
     userId: v.id("users"),
