@@ -175,7 +175,7 @@ export function CreateUniverseChatDialog({
                 </div>
               </div>
               <p className="text-muted-foreground">
-                Your adventure is ready to begin. Click "Start Adventure" to create your chat and start playing!
+                Your adventure is ready to begin. Click &quot;Start Adventure&quot; to create your chat and start playing!
               </p>
             </div>
           )}

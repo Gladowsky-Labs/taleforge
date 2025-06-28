@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings2, Trash2, Edit2, Check, X, PanelRightClose, Globe, User, Info, MessageSquare } from "lucide-react";
+import { Settings2, Trash2, Edit2, Check, X, PanelRightClose, Globe, User, Info } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
 
 interface ChatSettingsSidebarProps {
