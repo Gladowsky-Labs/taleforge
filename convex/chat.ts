@@ -9,6 +9,15 @@ export const sendMessage = action({
     content: v.string(),
   },
   handler: async (ctx, args): Promise<{ success: boolean; response?: string; error?: string }> => {
+    // Get chat details including universe and character
+    const chat = await ctx.runQuery(api.chats.get, {
+      chatId: args.chatId,
+    });
+
+    if (!chat) {
+      return { success: false, error: "Chat not found" };
+    }
+
     // First, save the user message
     await ctx.runMutation(api.messages.send, {
       chatId: args.chatId,
@@ -30,12 +39,86 @@ export const sendMessage = action({
     }>;
 
     try {
+      // Build context with universe and character information
+      let systemPrompt = "";
+      
+      if (chat.universeId) {
+        const universe = await ctx.runQuery(api.universes.get, {
+          id: chat.universeId,
+        });
+        
+        if (universe) {
+          systemPrompt += universe.systemPrompt;
+          
+          if (universe.gameInstructions) {
+            systemPrompt += "\n\n" + universe.gameInstructions;
+          }
+          
+          // Add character context
+          if (chat.characterId) {
+            const character = await ctx.runQuery(api.characters.get, {
+              id: chat.characterId,
+            });
+            
+            if (character) {
+              systemPrompt += `\n\nThe player is playing as: ${character.name}`;
+              systemPrompt += `\nCharacter description: ${character.description}`;
+              
+              if (character.personality) {
+                systemPrompt += `\nPersonality: ${character.personality}`;
+              }
+              
+              if (character.backstory) {
+                systemPrompt += `\nBackstory: ${character.backstory}`;
+              }
+              
+              if (character.specialAbilities?.length) {
+                systemPrompt += `\nSpecial abilities: ${character.specialAbilities.join(", ")}`;
+              }
+            }
+          } else if (chat.customCharacterId) {
+            const customCharacter = await ctx.runQuery(api.characters.getCustom, {
+              id: chat.customCharacterId,
+            });
+            
+            if (customCharacter) {
+              systemPrompt += `\n\nThe player is playing as their custom character: ${customCharacter.name}`;
+              systemPrompt += `\nCharacter description: ${customCharacter.description}`;
+              
+              if (customCharacter.personality) {
+                systemPrompt += `\nPersonality: ${customCharacter.personality}`;
+              }
+              
+              if (customCharacter.backstory) {
+                systemPrompt += `\nBackstory: ${customCharacter.backstory}`;
+              }
+              
+              if (customCharacter.specialAbilities?.length) {
+                systemPrompt += `\nSpecial abilities: ${customCharacter.specialAbilities.join(", ")}`;
+              }
+            }
+          }
+        }
+      }
+
+      // Prepare messages with system prompt
+      const conversationMessages: Array<{role: "user" | "assistant" | "system", content: string}> = [];
+      
+      if (systemPrompt) {
+        conversationMessages.push({
+          role: "system",
+          content: systemPrompt,
+        });
+      }
+      
+      conversationMessages.push(...messages.map((msg) => ({
+        role: msg.role as "user" | "assistant" | "system",
+        content: msg.content,
+      })));
+
       // Call the LLM
       const response = await ctx.runAction(api.openai.chat, {
-        messages: messages.map((msg) => ({
-          role: msg.role,
-          content: msg.content,
-        })),
+        messages: conversationMessages,
       }) as { content: string; model: string; usage?: any };
 
       // Save assistant message

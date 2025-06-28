@@ -267,4 +267,113 @@
     @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-1 focus:ring-offset-background;
     transition: box-shadow 0.15s ease-out;
   }
+  
+  /* Markdown Styling for Chat Messages */
+  .prose-sm {
+    @apply text-foreground;
+  }
+  
+  .prose-sm h1,
+  .prose-sm h2,
+  .prose-sm h3,
+  .prose-sm h4,
+  .prose-sm h5,
+  .prose-sm h6 {
+    @apply text-foreground font-bold;
+  }
+  
+  .prose-sm p {
+    @apply text-foreground mb-2 last:mb-0;
+  }
+  
+  .prose-sm strong {
+    @apply text-foreground font-bold;
+  }
+  
+  .prose-sm em {
+    @apply text-foreground italic;
+  }
+  
+  .prose-sm code {
+    @apply font-mono text-sm;
+  }
+  
+  .prose-sm pre {
+    @apply font-mono my-4;
+  }
+  
+  .prose-sm pre code {
+    @apply bg-transparent p-0;
+  }
+  
+  .prose-sm ul {
+    @apply list-disc list-inside my-2;
+  }
+  
+  .prose-sm ol {
+    @apply list-decimal list-outside pl-6 my-2;
+  }
+  
+  .prose-sm li {
+    @apply text-foreground my-1;
+  }
+  
+  .prose-sm blockquote {
+    @apply text-muted-foreground border-l-4 border-primary/30 pl-4 my-4 italic;
+  }
+  
+  .prose-sm a {
+    @apply text-primary hover:underline;
+  }
+  
+  .prose-sm hr {
+    @apply border-border my-4;
+  }
+  
+  .prose-sm table {
+    @apply w-full my-4;
+  }
+  
+  .prose-sm th {
+    @apply text-left font-bold bg-muted/50 p-2;
+  }
+  
+  .prose-sm td {
+    @apply border border-border p-2;
+  }
+  
+  /* User message specific styles */
+  [data-user="true"] .prose-sm,
+  [data-user="true"] .prose-sm h1,
+  [data-user="true"] .prose-sm h2,
+  [data-user="true"] .prose-sm h3,
+  [data-user="true"] .prose-sm h4,
+  [data-user="true"] .prose-sm h5,
+  [data-user="true"] .prose-sm h6,
+  [data-user="true"] .prose-sm p,
+  [data-user="true"] .prose-sm strong,
+  [data-user="true"] .prose-sm em,
+  [data-user="true"] .prose-sm li {
+    @apply text-white;
+  }
+  
+  [data-user="true"] .prose-sm blockquote {
+    @apply text-white/80 border-white/40;
+  }
+  
+  [data-user="true"] .prose-sm a {
+    @apply text-white underline;
+  }
+  
+  [data-user="true"] .prose-sm hr {
+    @apply border-white/20;
+  }
+  
+  [data-user="true"] .prose-sm th {
+    @apply bg-white/10;
+  }
+  
+  [data-user="true"] .prose-sm td {
+    @apply border-white/20;
+  }
 }

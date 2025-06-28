@@ -24,6 +24,9 @@ export const create = mutation({
   args: {
     title: v.string(),
     model: v.optional(v.string()),
+    universeId: v.optional(v.id("universes")),
+    characterId: v.optional(v.id("characters")),
+    customCharacterId: v.optional(v.id("customCharacters")),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -34,6 +37,9 @@ export const create = mutation({
     const chatId = await ctx.db.insert("chats", {
       userId,
       title: args.title,
+      universeId: args.universeId,
+      characterId: args.characterId,
+      customCharacterId: args.customCharacterId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       model: args.model || "gpt-4o-mini", // Default model

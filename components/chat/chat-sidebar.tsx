@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -13,10 +14,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MessageSquare, Settings, LogOut, ChevronDown, PanelLeftClose, X } from "lucide-react";
+import { MessageSquare, Settings, LogOut, ChevronDown, PanelLeftClose, X, Sparkles, UserPlus } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { CreateUniverseChatDialog } from "./create-universe-chat-dialog";
+import { CreateCharacterDialog } from "./create-character-dialog";
 
 interface ChatSidebarProps {
   onToggle?: () => void;
@@ -27,13 +30,12 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
   const params = useParams();
   const { signOut } = useAuthActions();
   const chats = useQuery(api.chats.list);
-  const createChat = useMutation(api.chats.create);
   const deleteChat = useMutation(api.chats.remove);
-
-  const handleCreateChat = async () => {
-    const chatId = await createChat({ title: "New Chat" });
-    router.push(`/chat/${chatId}`);
-  };
+  const [showUniverseDialog, setShowUniverseDialog] = useState(false);
+  const [showCharacterDialog, setShowCharacterDialog] = useState(false);
+  
+  // Get current user ID for universe chat creation
+  const currentUser = useQuery(api.users.currentUser);
 
   const handleSignOut = async () => {
     await signOut();
@@ -52,29 +54,40 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col overflow-hidden w-full">
-      <div className="flex items-center justify-between p-3 flex-shrink-0 border-b min-w-0">
-        <h2 className="text-base font-semibold truncate flex-1 min-w-0">Chats</h2>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={handleCreateChat}
-            className="h-8 w-8"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="sr-only">New chat</span>
-          </Button>
+      <div className="flex-shrink-0 border-b">
+        <div className="flex items-center justify-between p-3 min-w-0">
+          <h2 className="text-base font-semibold truncate flex-1 min-w-0">Chats</h2>
           {onToggle && (
             <Button
               size="icon"
               variant="ghost"
               onClick={onToggle}
-              className="h-8 w-8"
+              className="h-8 w-8 flex-shrink-0"
             >
               <PanelLeftClose className="h-4 w-4" />
               <span className="sr-only">Close sidebar</span>
             </Button>
           )}
+        </div>
+        <div className="px-3 pb-3 space-y-2">
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => setShowUniverseDialog(true)}
+            className="w-full justify-start"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            New Adventure
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowCharacterDialog(true)}
+            className="w-full justify-start"
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            New Character
+          </Button>
         </div>
       </div>
       <ScrollArea className="flex-1 overflow-y-auto">
@@ -86,14 +99,14 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
               >
                 <Button
                   variant={params.chatId === chat._id ? "secondary" : "ghost"}
-                  className="w-full justify-start h-auto py-2 px-2 group relative"
+                  className="w-55 justify-start h-auto py-2 pl-2 pr-8 group relative overflow-hidden"
                   onClick={() => {
                     router.push(`/chat/${chat._id}`);
                   }}
                 >
-                  <div className="flex items-center w-full min-w-0">
+                  <div className="flex items-center w-full min-w-0 overflow-hidden">
                     <MessageSquare className="mr-2 h-4 w-4 flex-shrink-0" />
-                    <span className="truncate text-sm flex-1 text-left">{chat.title}</span>
+                    <span className="truncate text-sm text-left min-w-0 block max-w-full">{chat.title}</span>
                   </div>
                 </Button>
                 <Button
@@ -158,7 +171,7 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
       {/* Mobile sidebar */}
       <Sheet>
         <SheetTrigger asChild className="md:hidden">
-          <Button variant="ghost" size="icon" className="absolute top-4 left-4">
+          <Button variant="ghost" size="sm" className="absolute top-4 left-4">
             <MessageSquare className="h-5 w-5" />
           </Button>
         </SheetTrigger>
@@ -166,6 +179,24 @@ export function ChatSidebar({ onToggle }: ChatSidebarProps = {}) {
           <SidebarContent />
         </SheetContent>
       </Sheet>
+
+      {/* Universe Chat Dialog */}
+      {currentUser?._id && (
+        <CreateUniverseChatDialog
+          open={showUniverseDialog}
+          onOpenChange={setShowUniverseDialog}
+          userId={currentUser._id}
+        />
+      )}
+
+      {/* Character Creation Dialog */}
+      {currentUser?._id && (
+        <CreateCharacterDialog
+          open={showCharacterDialog}
+          onOpenChange={setShowCharacterDialog}
+          userId={currentUser._id}
+        />
+      )}
     </>
   );
 }
